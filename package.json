@@ -1,0 +1,12 @@
+{
+  "name": "ai-cube-portfolio",
+  "version": "1.0.0",
+  "description": "A futuristic full-stack portfolio web application featuring a clickable 3D cube UI powered by React, Three.js, Express, and MySQL.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
