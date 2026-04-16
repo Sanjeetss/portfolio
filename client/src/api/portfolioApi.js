@@ -1,31 +1,49 @@
-const normalizeApiBaseUrl = (baseUrl) => {
-  const sanitizedBaseUrl = (baseUrl || 'http://localhost:5000/api').replace(
-    /\/+$/,
-    ''
-  );
+import fallbackData from "../data/fallbackPortfolio";
 
-  return sanitizedBaseUrl.endsWith('/api')
+const normalizeApiBaseUrl = (baseUrl) => {
+  if (!baseUrl) return null;
+
+  const sanitizedBaseUrl = baseUrl.replace(/\/+$/, "");
+
+  return sanitizedBaseUrl.endsWith("/api")
     ? sanitizedBaseUrl
     : `${sanitizedBaseUrl}/api`;
 };
 
 const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 
-const fetchJson = async (path) => {
-  const response = await fetch(`${API_BASE_URL}${path}`);
-
-  if (!response.ok) {
-    throw new Error(`Request failed for ${path}`);
+// 🔥 Core fetch wrapper with fallback and timeout
+const fetchWithFallback = async (path, fallback) => {
+  if (!API_BASE_URL) {
+    // No backend → use local data
+    return fallback;
   }
 
-  return response.json();
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) throw new Error();
+
+    return await response.json();
+  } catch (error) {
+    console.warn(`API failed for ${path}, using fallback`, error.message);
+    return fallback;
+  }
 };
 
 export const portfolioApi = {
-  getAbout: () => fetchJson('/about'),
-  getProjects: () => fetchJson('/projects'),
-  getSkills: () => fetchJson('/skills'),
-  getExperience: () => fetchJson('/experience'),
-  getEducation: () => fetchJson('/education'),
-  getContact: () => fetchJson('/contact')
+  getAbout: () => fetchWithFallback("/about", fallbackData.about),
+  getProjects: () => fetchWithFallback("/projects", fallbackData.projects),
+  getSkills: () => fetchWithFallback("/skills", fallbackData.skills),
+  getExperience: () =>
+    fetchWithFallback("/experience", fallbackData.experience),
+  getEducation: () => fetchWithFallback("/education", fallbackData.education),
+  getContact: () => fetchWithFallback("/contact", fallbackData.contact),
 };

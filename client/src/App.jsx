@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import Cube from "./components/Cube";
 import LoadingScreen from "./components/LoadingScreen";
 import { portfolioApi } from "./api/portfolioApi";
-import {
-  fallbackPortfolio,
+import fallbackPortfolio, {
   normalizePortfolioData,
 } from "./data/fallbackPortfolio";
 
@@ -83,7 +82,7 @@ export default function App() {
               Cube Portfolio Interface
             </p>
             <h1 className="font-display text-4xl uppercase tracking-[0.18em] text-white sm:text-5xl">
-              Sanjeet's Cube
+              Sanjeet Sawardekar
             </h1>
             <p className="mt-4 max-w-xl text-lg text-muted">
               Explore each face of the cube to navigate across bio, projects,

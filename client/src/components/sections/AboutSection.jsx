@@ -6,10 +6,11 @@ export default function AboutSection({ data }) {
   return (
     <div className="space-y-4">
       <div>
+        <p className="mt-2 text-lg text-accent text-white">I'm an</p>
         <h2 className="font-display text-2xl uppercase tracking-[0.12em] text-white">
-          {data.name}
+          {data.title}
         </h2>
-        <p className="mt-2 text-lg text-accent">{data.title}</p>
+        {/* <p className="mt-2 text-lg text-accent">{data.title}</p> */}
       </div>
       <p className="text-base leading-relaxed text-slate-200">{data.bio}</p>
       <div className="grid grid-cols-2 gap-3 pt-2">
