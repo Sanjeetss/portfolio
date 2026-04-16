@@ -106,14 +106,14 @@ export default function App() {
               <p className="hud-label mb-2 text-[10px] text-accent/70">Mode</p>
               <p className="font-display text-base text-white">Interactive</p>
             </div>
-            <div>
+            {/* <div>
               <p className="hud-label mb-2 text-[10px] text-accent/70">
                 Data Feed
               </p>
               <p className="font-display text-base text-white">
                 {apiStatus === "live" ? "Live API" : "Fallback Cache"}
               </p>
-            </div>
+            </div> */}
           </div>
         </header>
 
