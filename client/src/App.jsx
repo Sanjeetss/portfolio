@@ -21,7 +21,7 @@ export default function App() {
   useEffect(() => {
     let isMounted = true;
 
-    console.log("Page loaded");
+    // console.log("Page loaded");
 
     const loadPortfolio = async () => {
       try {
@@ -76,6 +76,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (isLoading || typingComplete || typedName) {
+      return undefined;
+    }
+
     let index = 0;
     let timeoutId;
 
@@ -88,16 +92,16 @@ export default function App() {
         timeoutId = window.setTimeout(typeNext, 150);
       } else {
         setTypingComplete(true);
-        console.log("SANJEET SAWARDEKAR typed completely");
+        // console.log("SANJEET SAWARDEKAR typed completely");
       }
     };
 
-    timeoutId = window.setTimeout(typeNext, 0);
+    timeoutId = window.setTimeout(typeNext, 200);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, []);
+  }, [isLoading]);
 
   useEffect(() => {
     const cursorInterval = window.setInterval(() => {
@@ -121,7 +125,7 @@ export default function App() {
             <p className="hud-label mb-4 text-xs text-accent/80">
               Cube Portfolio Interface
             </p>
-            <h1 className="font-display text-4xl uppercase tracking-[0.18em] text-white sm:text-5xl">
+            <h1 className="font-display text-4xl uppercase tracking-[0.18em] text-white sm:text-5xl min-h-[8rem] leading-[1.05]">
               {typedName}
               {!typingComplete && (
                 <span className="inline-block w-[0.5rem] text-white">

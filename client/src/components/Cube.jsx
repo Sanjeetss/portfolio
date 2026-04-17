@@ -510,7 +510,7 @@ export default function Cube({ portfolio }) {
       if (Math.abs(deltaX) >= Math.abs(deltaY)) {
         handleDirectionalMove(deltaX < 0 ? "right" : "left");
       } else {
-        handleDirectionalMove(deltaY < 0 ? "up" : "down");
+        handleDirectionalMove(deltaY < 0 ? "down" : "up");
       }
     };
 
