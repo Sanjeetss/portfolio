@@ -117,6 +117,7 @@ const getAdjacentFace = (face, direction, verticalContext) => {
 export default function Cube({ portfolio }) {
   const mountRef = useRef(null);
   const cssFacesRef = useRef(new Map());
+  const cssCubeGroupRef = useRef(null);
   const activeFaceRef = useRef("front");
   const verticalContextRef = useRef("front");
   const targetQuaternionRef = useRef(new THREE.Quaternion());
@@ -181,22 +182,33 @@ export default function Cube({ portfolio }) {
   };
 
   const applyDirectionalRotation = (direction) => {
-    const axis =
-      direction === "up" || direction === "down"
-        ? new THREE.Vector3(1, 0, 0)
-        : new THREE.Vector3(0, 1, 0);
-    const angleByDirection = {
-      up: Math.PI / 2,
-      down: -Math.PI / 2,
-      left: Math.PI / 2,
-      right: -Math.PI / 2,
+    // ✅ World-space axes — NEVER transform these by the cube quaternion.
+    // premultiply handles the orientation accumulation automatically.
+    const worldAxes = {
+      up: new THREE.Vector3(1, 0, 0), // pitch up = rotate around world +X
+      down: new THREE.Vector3(-1, 0, 0), // pitch down = rotate around world -X
+      left: new THREE.Vector3(0, 1, 0), // yaw left = rotate around world +Y
+      right: new THREE.Vector3(0, -1, 0), // yaw right = rotate around world -Y
     };
-    const stepQuaternion = new THREE.Quaternion().setFromAxisAngle(
-      axis,
-      angleByDirection[direction],
-    );
 
+    const axis = worldAxes[direction]; // ✅ pure world axis, no quaternion transform
+
+    const angle = Math.PI / 2; // always 90°, sign is baked into axis direction above
+
+    const stepQuaternion = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+
+    // premultiply = apply this rotation in WORLD space BEFORE existing orientation
     targetQuaternionRef.current.premultiply(stepQuaternion).normalize();
+
+    // console.log(`  🔧 applyDirectionalRotation("${direction}")`);
+    // console.log(`     World axis: (${axis.x}, ${axis.y}, ${axis.z})`);
+    // console.log(`     Rotating 90° around world axis`);
+    // console.log(
+    //   `     New targetQ: x=${targetQuaternionRef.current.x.toFixed(4)} y=${targetQuaternionRef.current.y.toFixed(4)} z=${targetQuaternionRef.current.z.toFixed(4)} w=${targetQuaternionRef.current.w.toFixed(4)}`,
+    // );
+    // console.log(
+    //   `     → Z component should stay ~0 for lateral/vertical moves. If not, axis is wrong.`,
+    // );
   };
 
   const navigateToFace = (targetFace, options = {}) => {
@@ -221,15 +233,83 @@ export default function Cube({ portfolio }) {
     }
   };
 
-  const handleDirectionalMove = (direction) => {
-    const nextFace = getAdjacentFace(
-      activeFaceRef.current,
-      direction,
-      verticalContextRef.current,
-    );
+  const directionVectors = {
+    up: new THREE.Vector3(0, 1, 0),
+    down: new THREE.Vector3(0, -1, 0),
+    left: new THREE.Vector3(-1, 0, 0),
+    right: new THREE.Vector3(1, 0, 0),
+  };
 
+  const faceNormals = {
+    front: new THREE.Vector3(0, 0, 1),
+    back: new THREE.Vector3(0, 0, -1),
+    left: new THREE.Vector3(-1, 0, 0),
+    right: new THREE.Vector3(1, 0, 0),
+    top: new THREE.Vector3(0, 1, 0),
+    bottom: new THREE.Vector3(0, -1, 0),
+  };
+
+  const handleDirectionalMove = (direction) => {
+    const faceNormalsLocal = {
+      front: new THREE.Vector3(0, 0, 1),
+      back: new THREE.Vector3(0, 0, -1),
+      left: new THREE.Vector3(-1, 0, 0),
+      right: new THREE.Vector3(1, 0, 0),
+      top: new THREE.Vector3(0, 1, 0),
+      bottom: new THREE.Vector3(0, -1, 0),
+    };
+    const screenDirections = {
+      up: new THREE.Vector3(0, 1, 0),
+      down: new THREE.Vector3(0, -1, 0),
+      left: new THREE.Vector3(-1, 0, 0),
+      right: new THREE.Vector3(1, 0, 0),
+    };
+
+    const targetQ = targetQuaternionRef.current;
+    const screenDir = screenDirections[direction];
+
+    // console.group(`🎯 handleDirectionalMove("${direction}")`);
+    // console.log("📐 Target Quaternion:", {
+    //   x: targetQ.x.toFixed(4),
+    //   y: targetQ.y.toFixed(4),
+    //   z: targetQ.z.toFixed(4),
+    //   w: targetQ.w.toFixed(4),
+    // });
+    // console.log("🖥️ Screen Direction:", screenDir);
+
+    let bestFace = "front";
+    let maxDot = -Infinity;
+
+    Object.entries(faceNormalsLocal).forEach(([face, localNormal]) => {
+      const worldNormal = localNormal.clone().applyQuaternion(targetQ);
+      const dot = worldNormal.dot(screenDir);
+      // console.log(
+      //   `  Face: ${face.padEnd(6)} | world: (${worldNormal.x.toFixed(3)}, ${worldNormal.y.toFixed(3)}, ${worldNormal.z.toFixed(3)}) | dot: ${dot.toFixed(4)}`,
+      // );
+      if (dot > maxDot) {
+        maxDot = dot;
+        bestFace = face;
+      }
+    });
+
+    // console.log(`✅ Best face: "${bestFace}" (dot=${maxDot.toFixed(4)})`);
+
+    // Apply rotation FIRST (uses targetQ before it changes)
     applyDirectionalRotation(direction);
-    navigateToFace(nextFace, { preserveOrientation: true });
+
+    // console.log("🔄 New targetQ after rotation:", {
+    //   x: targetQuaternionRef.current.x.toFixed(4),
+    //   y: targetQuaternionRef.current.y.toFixed(4),
+    //   z: targetQuaternionRef.current.z.toFixed(4),
+    //   w: targetQuaternionRef.current.w.toFixed(4),
+    // });
+    // console.log(
+    //   `⚠️  Z component: ${targetQuaternionRef.current.z.toFixed(4)} — should be ~0 for clean rotations`,
+    // );
+
+    navigateToFace(bestFace, { preserveOrientation: true });
+    // console.log(`📍 navigateToFace: "${bestFace}"`);
+    // console.groupEnd();
   };
 
   useEffect(() => {
@@ -305,6 +385,7 @@ export default function Cube({ portfolio }) {
 
     const webglCubeGroup = new THREE.Group();
     const cssCubeGroup = new THREE.Group();
+    cssCubeGroupRef.current = cssCubeGroup;
     scene.add(webglCubeGroup);
     cssScene.add(cssCubeGroup);
 
@@ -329,7 +410,7 @@ export default function Cube({ portfolio }) {
       new THREE.LineBasicMaterial({
         color: 0x58f6ff,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0,
       }),
     );
     webglCubeGroup.add(edges);
@@ -448,7 +529,9 @@ export default function Cube({ portfolio }) {
     window.addEventListener("resize", onResize);
 
     let animationFrameId;
+    let time = 0;
     const animate = () => {
+      time += 0.0025; // Approximate delta time for 60fps
       currentQuaternion.slerp(targetQuaternionRef.current, 0.1);
 
       webglCubeGroup.quaternion.copy(currentQuaternion);
@@ -496,10 +579,13 @@ export default function Cube({ portfolio }) {
           );
         }
 
+        // Add slow pendulum oscillation
+        const oscillation = Math.sin((time * Math.PI * 2) / 2) * 0.02; // 4-second period, 0.05 rad amplitude
+
         activeFaceObject.rotation.set(
           baseRotation[0],
           baseRotation[1],
-          baseRotation[2] + uprightCompensation,
+          baseRotation[2] + uprightCompensation + oscillation,
         );
       }
 
@@ -547,7 +633,7 @@ export default function Cube({ portfolio }) {
         <div className="pointer-events-none absolute left-5 top-5 rounded-full border border-accent/20 bg-base/60 px-4 py-2 text-xs uppercase tracking-[0.28em] text-accent backdrop-blur-xl">
           Click or swipe the cube
         </div>
-        {/* <div className="pointer-events-none absolute top-5 left-5 rounded-2xl border border-accent/15 bg-base/55 px-4 py-3 text-sm text-muted backdrop-blur-xl">
+        {/* <div className="pointer-events-none absolute bottom-5 left-5 rounded-2xl border border-accent/15 bg-base/55 px-4 py-3 text-sm text-muted backdrop-blur-xl">
           <p className="font-display uppercase tracking-[0.2em] text-white">
             Active Face
           </p>
@@ -555,6 +641,38 @@ export default function Cube({ portfolio }) {
             {faceEntries.find((face) => face.key === activeFace)?.label}
           </p>
         </div> */}
+        <button
+          type="button"
+          onClick={() => handleDirectionalMove("up")}
+          className="hidden md:flex absolute left-1/2 top-2 z-20 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+        >
+          {DIRECTION_ICONS.up}
+          {/* {directionalTargets.up} */}
+        </button>
+        <button
+          type="button"
+          onClick={() => handleDirectionalMove("down")}
+          className="hidden md:flex absolute left-1/2 bottom-2 z-20 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+        >
+          {DIRECTION_ICONS.down}
+          {/* {directionalTargets.down} */}
+        </button>
+        <button
+          type="button"
+          onClick={() => handleDirectionalMove("left")}
+          className="hidden md:flex absolute left-5 top-1/2 z-20 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+        >
+          {DIRECTION_ICONS.left}
+          {/* {directionalTargets.left} */}
+        </button>
+        <button
+          type="button"
+          onClick={() => handleDirectionalMove("right")}
+          className="hidden md:flex absolute right-5 top-1/2 z-20 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+        >
+          {DIRECTION_ICONS.right}
+          {/* {directionalTargets.right} */}
+        </button>
       </div>
 
       <aside className="glass-panel rounded-[2rem] p-5 sm:p-6">
@@ -571,7 +689,7 @@ export default function Cube({ portfolio }) {
                   : "border-accent/15 bg-white/5 text-muted hover:border-accent/35 hover:text-white"
               }`}
             >
-              <p className="font-display text-sm uppercase tracking-[0.14em]">
+              <p className="font-display text-bg uppercase tracking-[0.14em]">
                 {face.label}
               </p>
               <p className="mt-2 text-xs uppercase tracking-[0.2em] text-accent/70">

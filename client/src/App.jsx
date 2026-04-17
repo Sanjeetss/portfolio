@@ -7,15 +7,21 @@ import fallbackPortfolio, {
 } from "./data/fallbackPortfolio";
 
 const initialState = fallbackPortfolio;
+const fullName = "Sanjeet Sawardekar";
 
 export default function App() {
   const [portfolio, setPortfolio] = useState(initialState);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [apiStatus, setApiStatus] = useState("connecting");
+  const [typedName, setTypedName] = useState("");
+  const [showCursor, setShowCursor] = useState(true);
+  const [typingComplete, setTypingComplete] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
+
+    console.log("Page loaded");
 
     const loadPortfolio = async () => {
       try {
@@ -57,7 +63,7 @@ export default function App() {
         setApiStatus("fallback");
       } finally {
         if (isMounted) {
-          window.setTimeout(() => setIsLoading(false), 900);
+          window.setTimeout(() => setIsLoading(false), 5000);
         }
       }
     };
@@ -66,6 +72,40 @@ export default function App() {
 
     return () => {
       isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let index = 0;
+    let timeoutId;
+
+    const typeNext = () => {
+      const nextIndex = index + 1;
+      setTypedName(fullName.slice(0, nextIndex));
+      index = nextIndex;
+
+      if (nextIndex < fullName.length) {
+        timeoutId = window.setTimeout(typeNext, 150);
+      } else {
+        setTypingComplete(true);
+        console.log("SANJEET SAWARDEKAR typed completely");
+      }
+    };
+
+    timeoutId = window.setTimeout(typeNext, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  useEffect(() => {
+    const cursorInterval = window.setInterval(() => {
+      setShowCursor((current) => !current);
+    }, 500);
+
+    return () => {
+      window.clearInterval(cursorInterval);
     };
   }, []);
 
@@ -82,7 +122,12 @@ export default function App() {
               Cube Portfolio Interface
             </p>
             <h1 className="font-display text-4xl uppercase tracking-[0.18em] text-white sm:text-5xl">
-              Sanjeet Sawardekar
+              {typedName}
+              {!typingComplete && (
+                <span className="inline-block w-[0.5rem] text-white">
+                  {showCursor ? "|" : "\u00A0"}
+                </span>
+              )}
             </h1>
             <p className="mt-4 max-w-xl text-lg text-muted">
               Explore each face of the cube to navigate across bio, projects,
@@ -91,7 +136,7 @@ export default function App() {
             </p>
           </div>
 
-          <div className="glass-panel grid gap-3 rounded-3xl px-5 py-4 text-sm text-muted sm:grid-cols-2 xl:grid-cols-4">
+          <div className="glass-panel grid gap-3 rounded-3xl px-5 py-4 text-sm text-muted sm:grid-cols-2 xl:grid-cols-3">
             <div>
               <p className="hud-label mb-2 text-[10px] text-accent/70">
                 Engine
