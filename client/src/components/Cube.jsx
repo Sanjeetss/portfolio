@@ -38,6 +38,8 @@ const createFaceTransforms = (distance) => ({
   bottom: { position: [0, -distance, 0], rotation: [Math.PI / 2, 0, 0] },
 });
 
+const currentQuaternionRef = useRef(new THREE.Quaternion());
+
 const interpolateAngle = (current, target, factor) => {
   let delta = target - current;
   delta = ((delta + Math.PI) % (Math.PI * 2)) - Math.PI;
@@ -321,7 +323,7 @@ export default function Cube({ portfolio }) {
 
     const scene = new THREE.Scene();
     const cssScene = new THREE.Scene();
-    const currentQuaternion = new THREE.Quaternion();
+    const currentQuaternion = currentQuaternionRef.current;
     const faceWorldQuaternion = new THREE.Quaternion();
     const faceNormalWorld = new THREE.Vector3();
     const faceUpWorld = new THREE.Vector3();
