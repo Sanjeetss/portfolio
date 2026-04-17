@@ -8,7 +8,7 @@ export default function LoadingScreen() {
           <div className="absolute inset-[1.65rem] rounded-full bg-accent/10 shadow-glow" />
         </div>
         <p className="font-display text-sm uppercase tracking-[0.45em] text-accent">
-          Loading Sanjeets Portfolio
+          Loading Sanjeet's Portfolio
         </p>
       </div>
     </div>
