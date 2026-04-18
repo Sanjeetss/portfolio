@@ -72,7 +72,7 @@ a {
     20px 30px;
   opacity: 0.22;
   pointer-events: none;
-  animation: starfieldDrift 15s linear infinite;
+  animation: starfieldDrift 60s linear infinite;
 }
 
 @keyframes starfieldDrift {

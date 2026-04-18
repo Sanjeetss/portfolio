@@ -124,6 +124,7 @@ export default function Cube({ portfolio }) {
   const targetQuaternionRef = useRef(new THREE.Quaternion());
   const [activeFace, setActiveFace] = useState("front");
   const [verticalContext, setVerticalContext] = useState("front");
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
   const faceEntries = useMemo(
     () => [
@@ -160,6 +161,15 @@ export default function Cube({ portfolio }) {
     ],
     [portfolio],
   );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     activeFaceRef.current = activeFace;
@@ -617,12 +627,14 @@ export default function Cube({ portfolio }) {
     };
   }, [faceEntries]);
 
-  const directionalTargets = {
-    up: getAdjacentFace(activeFace, "up", verticalContext),
-    down: getAdjacentFace(activeFace, "down", verticalContext),
-    left: getAdjacentFace(activeFace, "left", verticalContext),
-    right: getAdjacentFace(activeFace, "right", verticalContext),
-  };
+  const directionalTargets = useMemo(() => {
+    return {
+      up: getAdjacentFace(activeFace, "up", verticalContext),
+      down: getAdjacentFace(activeFace, "down", verticalContext),
+      left: getAdjacentFace(activeFace, "left", verticalContext),
+      right: getAdjacentFace(activeFace, "right", verticalContext),
+    };
+  }, [activeFace, verticalContext]);
 
   return (
     <section className="grid flex-1 gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
@@ -642,38 +654,46 @@ export default function Cube({ portfolio }) {
             {faceEntries.find((face) => face.key === activeFace)?.label}
           </p>
         </div> */}
-        <button
-          type="button"
-          onClick={() => handleDirectionalMove("up")}
-          className="hidden md:flex absolute left-1/2 top-2 z-20 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
-        >
-          {DIRECTION_ICONS.up}
-          {/* {directionalTargets.up} */}
-        </button>
-        <button
-          type="button"
-          onClick={() => handleDirectionalMove("down")}
-          className="hidden md:flex absolute left-1/2 bottom-2 z-20 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
-        >
-          {DIRECTION_ICONS.down}
-          {/* {directionalTargets.down} */}
-        </button>
-        <button
-          type="button"
-          onClick={() => handleDirectionalMove("left")}
-          className="hidden md:flex absolute left-5 top-1/2 z-20 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
-        >
-          {DIRECTION_ICONS.left}
-          {/* {directionalTargets.left} */}
-        </button>
-        <button
-          type="button"
-          onClick={() => handleDirectionalMove("right")}
-          className="hidden md:flex absolute right-5 top-1/2 z-20 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
-        >
-          {DIRECTION_ICONS.right}
-          {/* {directionalTargets.right} */}
-        </button>
+        {isDesktop && (
+          <button
+            type="button"
+            onClick={() => handleDirectionalMove("up")}
+            className="absolute left-1/2 top-2 z-20 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+          >
+            {DIRECTION_ICONS.up}
+            {/* {directionalTargets.up} */}
+          </button>
+        )}
+        {isDesktop && (
+          <button
+            type="button"
+            onClick={() => handleDirectionalMove("down")}
+            className="absolute left-1/2 bottom-2 z-20 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+          >
+            {DIRECTION_ICONS.down}
+            {/* {directionalTargets.down} */}
+          </button>
+        )}
+        {isDesktop && (
+          <button
+            type="button"
+            onClick={() => handleDirectionalMove("left")}
+            className="absolute left-5 top-1/2 z-20 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+          >
+            {DIRECTION_ICONS.left}
+            {/* {directionalTargets.left} */}
+          </button>
+        )}
+        {isDesktop && (
+          <button
+            type="button"
+            onClick={() => handleDirectionalMove("right")}
+            className="absolute right-5 top-1/2 z-20 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+          >
+            {DIRECTION_ICONS.right}
+            {/* {directionalTargets.right} */}
+          </button>
+        )}
       </div>
 
       <aside className="glass-panel rounded-[2rem] p-5 sm:p-6">
