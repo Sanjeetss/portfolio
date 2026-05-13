@@ -96,7 +96,7 @@ a {
   }
 }
 
-@keyframes glowPulse {
+/* @keyframes glowPulse {
   0%,
   100% {
     box-shadow:
@@ -110,7 +110,7 @@ a {
       0 18px 40px rgba(0, 0, 0, 0.45),
       0 0 40px rgba(88, 246, 255, 0.25);
   }
-}
+} */
 
 @keyframes scan {
   0% {
