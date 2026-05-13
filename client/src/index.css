@@ -195,7 +195,7 @@ a {
   }
 }
 
-button {
+.arrow-button {
   animation: arrowPulse 3s ease-in-out infinite;
 }
 

@@ -658,7 +658,7 @@ export default function Cube({ portfolio }) {
           <button
             type="button"
             onClick={() => handleDirectionalMove("up")}
-            className="absolute left-1/2 top-2 z-20 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+            className="absolute left-1/2 top-2 z-20 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white arrow-button"
           >
             {DIRECTION_ICONS.up}
             {/* {directionalTargets.up} */}
@@ -668,7 +668,7 @@ export default function Cube({ portfolio }) {
           <button
             type="button"
             onClick={() => handleDirectionalMove("down")}
-            className="absolute left-1/2 bottom-2 z-20 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+            className="absolute left-1/2 bottom-2 z-20 -translate-x-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white arrow-button"
           >
             {DIRECTION_ICONS.down}
             {/* {directionalTargets.down} */}
@@ -678,7 +678,7 @@ export default function Cube({ portfolio }) {
           <button
             type="button"
             onClick={() => handleDirectionalMove("left")}
-            className="absolute left-5 top-1/2 z-20 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+            className="absolute left-5 top-1/2 z-20 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white arrow-button"
           >
             {DIRECTION_ICONS.left}
             {/* {directionalTargets.left} */}
@@ -688,7 +688,7 @@ export default function Cube({ portfolio }) {
           <button
             type="button"
             onClick={() => handleDirectionalMove("right")}
-            className="absolute right-5 top-1/2 z-20 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white"
+            className="absolute right-5 top-1/2 z-20 -translate-y-1/2 w-10 h-10 items-center justify-center rounded-full border border-accent/25 bg-base/70 text-lg text-accent backdrop-blur-xl transition hover:border-accent/60 hover:bg-accent/10 hover:text-white arrow-button"
           >
             {DIRECTION_ICONS.right}
             {/* {directionalTargets.right} */}
