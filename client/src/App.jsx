@@ -7,7 +7,8 @@ import fallbackPortfolio, {
 } from "./data/fallbackPortfolio";
 
 const initialState = fallbackPortfolio;
-const fullName = "Sanjeet Sawardekar";
+const firstName = "SANJEET";
+const lastName = "SAWARDEKAR";
 
 export default function App() {
   const [portfolio, setPortfolio] = useState(initialState);
@@ -80,19 +81,26 @@ export default function App() {
       return undefined;
     }
 
+    let currentText = "";
     let index = 0;
+
+    const combined = `${firstName}\n${lastName}`;
+
     let timeoutId;
 
     const typeNext = () => {
-      const nextIndex = index + 1;
-      setTypedName(fullName.slice(0, nextIndex));
-      index = nextIndex;
+      currentText += combined[index];
+      setTypedName(currentText);
 
-      if (nextIndex < fullName.length) {
-        timeoutId = window.setTimeout(typeNext, 150);
+      index += 1;
+
+      if (index < combined.length) {
+        timeoutId = window.setTimeout(
+          typeNext,
+          combined[index] === "\n" ? 250 : 150,
+        );
       } else {
         setTypingComplete(true);
-        // console.log("SANJEET SAWARDEKAR typed completely");
       }
     };
 
@@ -125,7 +133,7 @@ export default function App() {
             <p className="hud-label mb-4 text-xs text-accent/80">
               Cube Portfolio Interface
             </p>
-            <h1 className="font-display text-4xl uppercase tracking-[0.18em] text-white sm:text-5xl min-h-[8rem] leading-[1.05]">
+            <h1 className="font-display text-4xl uppercase tracking-[0.18em] text-white sm:text-5xl min-h-[8rem] leading-[1.05] whitespace-pre-line">
               {typedName}
               {!typingComplete && (
                 <span className="inline-block w-[0.5rem] text-white">
