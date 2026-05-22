@@ -2,7 +2,7 @@ const fallbackPortfolio = {
   about: {
     id: 1,
     name: "Sanjeet Sawardekar",
-    title: "AI Engineer",
+    title: "AI Engineer | Full Stack Developer",
     bio: "Specializing in converting research prototypes into scalable, production-grade ML and LLM solutions. Experienced in NLP, Computer Vision, model deployment, and cloud-native AI systems across AWS and GCP, with a strong focus on end-to-end ML pipelines and reusable AI components.",
   },
 
