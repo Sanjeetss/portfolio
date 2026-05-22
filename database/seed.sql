@@ -12,7 +12,7 @@ VALUES
   (
     1,
     'Sanjeet Sawardekar',
-    'AI Engineer',
+    'AI Engineer | Full Stack Developer',
     'AI Engineer specializing in converting research prototypes into scalable, production-grade ML and LLM solutions. Experienced in NLP, Computer Vision, model deployment, and cloud-native AI systems across AWS and GCP, with a strong focus on end-to-end ML pipelines and reusable AI components.'
   );
 
